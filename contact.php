@@ -109,7 +109,7 @@
                     <textarea rows="3" required="required" name="message" id="message" placeholder="Include your orderID for refund. We will get back to you shortly!"></textarea>
                     <input type="hidden" name="_subject" id="email-subject" value="Contact Form">
                 </fieldset>
-                <button class="normal" data-message="Contact form submitted" onclick="showSuccessMessage(event)">Submit Contact Form</button>
+                <button class="normal" data-message="Contact form submitted">Submit Contact Form</button>
             </form>
 
 

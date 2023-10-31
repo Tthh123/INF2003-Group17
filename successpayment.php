@@ -281,6 +281,9 @@ include('nav.inc.php');
                                 <a href="accountsetting.php">
                                     <div class="complement">Go to Profile</div>
                                 </a>
+                                <a href="reviews.php">
+                                    <div class="complement">Leave your review!</div>
+                                </a>
                             </div>
                         </div>
                         <div class="jagged-edge"></div>
