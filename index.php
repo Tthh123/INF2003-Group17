@@ -2,6 +2,7 @@
 $page = 'index'; // change this to match the name of the page
 include('nav.inc.php');
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -161,12 +162,10 @@ include('nav.inc.php');
         <section id="product1" class="section-p1">
             <h2>Featured Products</h2>
             <p>Must-Have Products for Your Hair</p>
-
             <div class="pro-container">
 
                 <?php
-                $products = array('Untangle Me', 'Minuel Hair Spray', 'Japanese Blue Wax', 'Japanese Red Wax'); // Replace with the names of the products you want to display
-                get_products($products);
+                get_products();
                 ?>
 
         </section>
@@ -199,8 +198,7 @@ include('nav.inc.php');
             <div class="pro-container">
 
                 <?php
-                $products = array('Heat Protection Serum', 'Round Hair Brush', 'Fudge Matte Hed Styling Wax', 'Loreal Hair Repair Shampoo');
-                get_products($products);
+                get_products('random')
                 ?>
 
         </section>
