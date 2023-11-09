@@ -69,34 +69,30 @@
             <h2>#Manage Reviews using SQL</h2>
         </section>
 
-        <section id="reviews-management">
-            <!-- Batch insert section -->
+        <section id="reviews-management" class="container my-4">
             <div class="batch-insert-section">
-                <h3>Batch Insert</h3>
-                <button id="insert-1k">Insert 1K Records</button>
-                <button id="insert-10k">Insert 10K Records</button>
-                <button id="insert-50k">Insert 50K Records</button>
+                <h3>Batch Insert Records</h3>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <button id="insert-1k" class="btn btn-primary btn-block">Insert 1K Records</button>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <button id="insert-10k" class="btn btn-primary btn-block">Insert 10K Records</button>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <button id="insert-50k" class="btn btn-primary btn-block">Insert 50K Records</button>
+                    </div>
+                </div>
                 <div id="insert-results"></div>
             </div>
 
             <!-- Filter by rating section -->
-            <div class="filter-rating-section">
-                <h3>Filter by Rating</h3>
-                <button id="filter-1k">Filter 1K Records</button>
-                <button id="filter-10k">Filter 10K Records</button>
-                <button id="filter-50k">Filter 50K Records</button>
-                <div id="filter-results"></div>
-            </div>
+            <?php include "process_sqlreviewssinglesearch.php"; ?>
 
-            <!-- Search single row section -->
-            <div class="search-single-row-section">
-                <h3>Search Single Row</h3>
-                <button id="search-single">Search</button>
-                <div id="search-results"></div>
-            </div>
         </section>
 
-        <?php include "process_reviewsmanagement.php"; ?>
+        <!-- Filter by rating section -->
+        <?php include "process_sqlbatchsearch.php"; ?>
 
         <script>
             // Add event listeners to the buttons
