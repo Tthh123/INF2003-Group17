@@ -71,7 +71,7 @@
 
         <section id="reviews-management" class="container my-4">
             <div class="batch-insert-section">
-                <h3>Batch Insert Records</h3>
+                <h3>Batch Insert Records Performance Analysis</h3>
                 <div class="row">
                     <div class="col-md-4 mb-3">
                         <button id="insert-1k" class="btn btn-primary btn-block">Insert 1K Records</button>

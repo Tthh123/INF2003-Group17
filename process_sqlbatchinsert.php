@@ -55,7 +55,7 @@ function generateUniqueOrderId($conn) {
     $orderId = 'Order' . rand(1, 2000000);
     // Check if order ID already exists in the database
     $result = $conn->query("SELECT 1 FROM trackorder WHERE order_id = '$orderId'");
-    while($result->num_rows > 0) {
+    while ($result->num_rows > 0) {
         $orderId = 'Order' . rand(1, 2000000);
         $result = $conn->query("SELECT 1 FROM trackorder WHERE order_id = '$orderId'");
     }
@@ -67,51 +67,79 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['recordCount'])) {
 
     $recordCount = intval($_POST['recordCount']);
     $batchSize = 10000; // Adjust the batch size if necessary
-    
-    // Disable foreign key checks for speed
-    $conn->query("SET FOREIGN_KEY_CHECKS=0;");
-    $conn->autocommit(FALSE); // Turn off autocommit for better performance on insert
-
-    $startTime = microtime(true); // Start timing
-    
-    $insertValues = []; // Array to hold all rows for batch insert
-    $queryBase = "INSERT INTO reviews (order_id, name, rating, message, image_filename) VALUES ";
-
-    // Generate all insert values up front
+    // Prepare the data set for insertion
+    $insertValues = [];
     for ($i = 0; $i < $recordCount; $i++) {
         $order_id = generateUniqueOrderId($conn);
         $name = $conn->real_escape_string(generateRandomName());
         $rating = rand(1, 5);
-        $message = $conn->real_escape_string(generateRandomMessage()); // Use the generateRandomMessage function
+        $message = $conn->real_escape_string(generateRandomMessage());
         $imageFilename = $conn->real_escape_string(generateRandomFilename());
-
         $insertValues[] = "('$order_id', '$name', $rating, '$message', '$imageFilename')";
-        
-        // Execute the batch insert when the batch size is reached or it's the last record
-        if (count($insertValues) >= $batchSize || $i == $recordCount - 1) {
-            $query = $queryBase . implode(', ', $insertValues);
+    }
+
+    // Disable autocommit for better performance on insert
+    $conn->autocommit(FALSE);
+
+    // Disable foreign key checks for speed
+    $conn->query("SET FOREIGN_KEY_CHECKS=0;");
+
+    $tables = [
+        'reviews' => 'No Indexes',
+        'reviews1' => 'Individual Indexes',
+        'reviews2' => 'Composite Index'
+    ];
+    $performanceResults = [];
+
+    foreach ($tables as $table => $indexType) {
+        $queryBase = "INSERT INTO $table (order_id, name, rating, message, image_filename) VALUES ";
+        $startTime = microtime(true); // Start timing for the current table
+        // Insert data in batches
+        for ($i = 0; $i < count($insertValues); $i += $batchSize) {
+            $batch = array_slice($insertValues, $i, $batchSize);
+            $query = $queryBase . implode(', ', $batch);
             if (!$conn->query($query)) {
-                $errorMsg = "Error: " . $conn->error;
+                $errorMsg = "Error in $table: " . $conn->error;
                 $success = false;
                 break; // Exit the loop on error
             }
-            $insertValues = []; // Reset array for the next batch
+        }
+
+        // Commit the transaction for the current table
+        $conn->commit();
+
+        $endTime = microtime(true); // End timing for the current table
+        $timeTaken = $endTime - $startTime; // Calculate the time taken for the current table
+        // Collect performance data
+        $performanceResults[$table] = [
+            'timeTaken' => $timeTaken,
+            'indexType' => $indexType
+        ];
+
+        if (!$success) {
+            break; // If there was an error, do not continue with the next tables
         }
     }
-    
-    // Commit the transaction
-    $conn->commit();
 
     // Re-enable foreign key checks
     $conn->query("SET FOREIGN_KEY_CHECKS=1;");
-    $endTime = microtime(true); // End timing
-    $timeTaken = $endTime - $startTime; // Calculate the time taken
 
     // Turn autocommit back on
     $conn->autocommit(TRUE);
-    // Output the result
+
+    // Output the performance results
+    echo "<div class='timing-results-container'>";
+    foreach ($performanceResults as $tableName => $metrics) {
+        echo "<div class='timing-results'>";
+        echo "<p>Table: $tableName (Index Type: {$metrics['indexType']})</p>";
+        echo "<p>Time Taken: " . sprintf('%.4f', $metrics['timeTaken']) . " seconds</p>";
+        echo "</div>";
+    }
+    echo "</div>";
+
+    // Output the final result
     if ($success) {
-        echo "Inserted {$recordCount} records successfully in {$timeTaken} seconds.";
+        echo "Inserted {$recordCount} records into each table successfully.";
     } else {
         echo "Batch insert failed: {$errorMsg}";
     }
@@ -119,5 +147,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['recordCount'])) {
 
 // Close the database connection
 $conn->close();
-
 ?>

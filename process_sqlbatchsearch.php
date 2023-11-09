@@ -33,7 +33,7 @@
     <body>
 
         <div class="container mt-5">
-            <h1 class="text-center">Customer Reviews</h1>
+            <h1 class="text-center">Batch Search Customer Reviews</h1>
 
             <form action="" method="get" class="mb-4">
                 <div class="form-row">
@@ -96,65 +96,86 @@
                     $conditions[] = "rating = " . $conn->real_escape_string($ratingFilter);
                 }
 
-                // Search and display for each table
+                // Initialize an array to hold the performance results
+                $performanceResults = [];
                 $tables = ['reviews', 'reviews1', 'reviews2'];
-                $previousNumRecords = null;
-                $displayedRowCount = 0; // Counter for displayed rows
+                $indexTypes = [
+                    'reviews' => 'No Indexes',
+                    'reviews1' => 'Individual Indexes',
+                    'reviews2' => 'Composite Index'
+                ];
 
-
+                // Search and display for each table
                 foreach ($tables as $table) {
                     $sql = "SELECT * FROM $table";
                     if ($conditions) {
                         $sql .= " WHERE " . implode(' AND ', $conditions);
                     }
+
                     $sql .= " LIMIT " . $rowCount;
 
+                    // Start timing
                     $startTime = microtime(true);
+
+                    // Execute the query
                     $result = $conn->query($sql);
-                    
+
+                    // End timing
                     $endTime = microtime(true);
 
+                    // Calculate the duration
                     $timeTaken = $endTime - $startTime;
+
+                    // Count the records
                     $numRecords = $result->num_rows;
 
-                    // If the number of records is the same as the previous table, do not repeat displaying the reviews
-                    if ($previousNumRecords === null || $previousNumRecords !== $numRecords) {
-                        $previousNumRecords = $numRecords;
-
-                        echo "<h2>Results for $table</h2>";
-                        echo "<div class='timing-info'>";
-                        echo "<strong>Query Time:</strong> " . number_format($timeTaken, 4) . " seconds<br>";
-                        echo "<strong>Number of Records Displayed:</strong> " . $numRecords;
-                        echo "</div>";
-
-                        // Display the results if any records found, limited to 10 rows
-                        if ($numRecords > 0 && $displayedRowCount < 10) {
-                            $imageDirectory = 'img/reviews';
-                            while ($review = $result->fetch_assoc()) {
-                                echo "<div class='review'>";
-                                echo "<h3>Order ID: " . htmlspecialchars($review['order_id']) . "</h3>";
-                                echo "<p>Name: " . htmlspecialchars($review['name']) . "</p>";
-                                echo "<p>Rating: " . str_repeat('&#9733;', $review['rating']) . " Stars</p>";
-                                echo "<p>Message: " . htmlspecialchars($review['message']) . "</p>";
-
-                                $imageFilename = htmlspecialchars($review['image_filename']);
-                                $imagePath = $imageDirectory . '/' . $imageFilename; // Fix image path
-                                if (file_exists($imagePath)) {
-                                    echo "<img src='$imagePath' alt='Review Image' class='review-image' />";
-                                } else {
-                                    echo "<p>Image not found: $imageFilename</p>";
-                                }
-                                echo "</div>";
-                                $displayedRowCount++; // Increment the displayed row counter
-                            }
-                        }
-                        echo "<hr>";
-                    }
+                    // Collect the performance metrics
+                    $performanceResults[$table] = [
+                        'timeTaken' => $timeTaken,
+                        'numRecords' => $numRecords,
+                        'indexType' => $indexTypes[$table]
+                    ];
                 }
 
-                $conn->close();
+                // Display the performance metrics
+                echo "<div class='timing-results-container'>";
+                foreach ($performanceResults as $tableName => $metrics) {
+                    echo "<div class='timing-results'>";
+                    echo "<p>Table: $tableName ({$metrics['indexType']})</p>";
+                    echo "<p>Time Taken: " . sprintf('%.4f', $metrics['timeTaken']) . " seconds</p>";
+                    echo "<p>Records Found: {$metrics['numRecords']}</p>";
+                    echo "</div>";
+                }
+                echo "</div>";
+                
+                // Display the results if any records found, limited to 10 rows
+                if ($numRecords > 0 && $displayedRowCount < 10) {
+                    $imageDirectory = 'img/reviews';
+                    while ($review = $result->fetch_assoc()) {
+                        echo "<div class='review'>";
+                        echo "<h3>Order ID: " . htmlspecialchars($review['order_id']) . "</h3>";
+                        echo "<p>Name: " . htmlspecialchars($review['name']) . "</p>";
+                        echo "<p>Rating: " . str_repeat('&#9733;', $review['rating']) . " Stars</p>";
+                        echo "<p>Message: " . htmlspecialchars($review['message']) . "</p>";
+
+                        $imageFilename = htmlspecialchars($review['image_filename']);
+                        $imagePath = $imageDirectory . '/' . $imageFilename; // Fix image path
+                        if (file_exists($imagePath)) {
+                            echo "<img src='$imagePath' alt='Review Image' class='review-image' />";
+                        } else {
+                            echo "<p>Image not found: $imageFilename</p>";
+                        }
+                        echo "</div>";
+                        $displayedRowCount++; // Increment the displayed row counter
+                    }
+                }
+                echo "<hr>";
             }
+
+            $conn->close();
             ?>
+            
+            
         </div>
 
         <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
