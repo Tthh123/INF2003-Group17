@@ -87,12 +87,12 @@
             </div>
 
             <!-- Filter by rating section -->
-            <?php include "process_sqlreviewssinglesearch.php"; ?>
+            <?php include "process_mongoreviewssinglesearch.php"; ?>
 
         </section>
 
         <!-- Filter by rating section -->
-        <?php include "process_sqlbatchsearch.php"; ?>
+        <?php include "process_mongobatchsearch.php"; ?>
 
         <script>
             // Add event listeners to the buttons
