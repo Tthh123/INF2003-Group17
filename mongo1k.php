@@ -1,11 +1,9 @@
 <?php
-require 'vendor/autoload.php'; // Include the Composer autoload file
 
+require 'vendor/autoload.php'; // Include the Composer autoload file
 // Configuration
 $mongoDBClient = new MongoDB\Client("mongodb://localhost:27017"); // Connect to your MongoDB server
 $database = $mongoDBClient->selectDatabase('NoSQLDatabase'); // Select your database
-$collection = $database->selectCollection('Reviews'); // Select your collection
-
 // Open the CSV file
 if (($handle = fopen("NoSQL_1K.csv", "r")) !== FALSE) {
     // Read the first line as headers
@@ -20,26 +18,36 @@ if (($handle = fopen("NoSQL_1K.csv", "r")) !== FALSE) {
         // Remove the double quotes and newline, then split by semicolon
         $row = str_getcsv(trim($rowData, "\"\n\r"), ';');
         // Combine header and row to an associative array if they match in count
-        if(count($header) == count($row)) {
+        if (count($header) == count($row)) {
             $reviewsData[] = array_combine($header, $row);
         }
     }
     fclose($handle); // Close the CSV file
-
-    // Start timing
-    $startTime = microtime(true);
-
-    // Batch insert into MongoDB
-    try {
-        $insertManyResult = $collection->insertMany($reviewsData);
-        echo "Inserted " . $insertManyResult->getInsertedCount() . " documents\n";
-    } catch (MongoDB\Driver\Exception\Exception $e) {
-        echo "An error occurred: " . $e->getMessage() . "\n";
+    if (empty($reviewsData)) {
+        die("No data to insert");
     }
 
-    // End timing
-    $endTime = microtime(true);
-    $executionTime = $endTime - $startTime;
-    echo "Insertion took " . $executionTime . " seconds.\n";
+    $collections = $database->listCollections();
+
+    foreach ($collections as $collectionInfo) {
+        $collectionName = $collectionInfo->getName();
+        $collection = $database->selectCollection($collectionName);
+        $startTime = microtime(true);
+
+        // Batch insert into MongoDB
+        try {
+            $insertManyResult = $collection->insertMany($reviewsData);
+            echo "Inserted " . $insertManyResult->getInsertedCount() . " documents\n";
+        } catch (MongoDB\Driver\Exception\Exception $e) {
+            echo "An error occurred: " . $e->getMessage() . "\n";
+        }
+
+        // End timing
+        $endTime = microtime(true);
+        $executionTime = $endTime - $startTime;
+        echo "Insertion took " . $executionTime . " seconds.\n";
+    }
+
+    // Start timing
 }
 ?>
