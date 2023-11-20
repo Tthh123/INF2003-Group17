@@ -79,7 +79,7 @@
                 $nameSearch = $_GET['nameSearch'] ?? '';
                 $messageSearch = $_GET['messageSearch'] ?? '';
                 $ratingFilter = $_GET['rating'] ?? '';
-                $rowCount = $_GET['rows'] ?? 1000;
+                $rowCount = (int)$_GET['rows'] ?? 1000;
 
                 $query = [];
                 if ($nameSearch !== '') {
@@ -89,15 +89,20 @@
                     $query['message'] = new MongoDB\BSON\Regex($messageSearch, 'i');
                 }
                 if ($ratingFilter !== '') {
-                    $query['rating'] = (int) $ratingFilter;
+                    $query['rating'] =  $ratingFilter;
                 }
+
+                var_dump($query);
 
                 // Start timing
                 $startTime = microtime(true);
 
-                // Perform the search with filters
-                $cursor = $collection->find($query, ['limit' => $rowCount]);
-
+                try {
+                    // Perform the search with filters
+                    $cursor = $collection->find($query, ['limit' => $rowCount]);
+                } catch (Exception $e) {
+                    echo 'MongoDB Query Error: ' . $e->getMessage();
+                }
                 // End timing
                 $endTime = microtime(true);
                 $timeTaken = $endTime - $startTime;
@@ -117,8 +122,6 @@
                 echo "<p>Please enter search criteria.</p>";
             }
             ?>
-
-
         </div>
 
         <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
