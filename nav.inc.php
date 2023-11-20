@@ -44,11 +44,28 @@ include "process_productsdetails.php";
 
             <?php if (isset($_SESSION['usertype']) && $_SESSION['usertype'] == 'admin') { ?>
                 <li><a <?php
-                    if ($page == 'reviews') {
+                    if ($page == 'reviews1') {
                         echo 'class="active"';
                     }
-                    ?> href="reviewsmanagement.php">Reviews</a></li>
+                    ?> href="nosqlreviewsmanagement.php">SQL Reviews</a></li>
                 <?php } ?>
+
+            <?php if (isset($_SESSION['usertype']) && $_SESSION['usertype'] == 'admin') { ?>
+                <li><a <?php
+                    if ($page == 'nosqlreviews1') {
+                        echo 'class="active"';
+                    }
+                    ?> href="mongoreviewsmanagement.php">NoSQL Reviews</a></li>
+                <?php } ?>
+
+            <?php if (isset($_SESSION['usertype']) && $_SESSION['usertype'] == 'admin') { ?>
+                <li><a <?php
+                    if ($page == 'submitreviews') {
+                        echo 'class="active"';
+                    }
+                    ?> href="reviews.php">Submit Reviews</a></li>
+                <?php } ?>
+
 
             <li><a <?php
                 if ($page == 'about') {

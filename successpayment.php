@@ -254,29 +254,41 @@ include('nav.inc.php');
                             <div class="order-details">
                                 <div class="order-number-label">Order ID</div>
                                 <?php
-                                // Create database connection
+                                session_start();
+
+// Enable error reporting for debugging
+                                mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
+// Create database connection
                                 $config = parse_ini_file('../../private/db-config.ini');
                                 $conn = new mysqli($config['servername'], $config['username'], $config['password'], $config['dbname']);
 
-                                // Check connection
+// Check connection
                                 if ($conn->connect_error) {
                                     die("Connection failed: " . $conn->connect_error);
                                 }
 
-                                // Get the latest order_id for the session email
+// Get the latest order_id for the session email
                                 $email = $_SESSION['email'];
-                                $query = "SELECT order_id FROM trackorder WHERE email='$email' ORDER BY order_id DESC LIMIT 1";
-                                $result = mysqli_query($conn, $query);
 
-                                // Display the order_id
-                                if ($row = mysqli_fetch_assoc($result)) {
+                                $query = "SELECT Distinct t.order_id FROM trackorder t
+          INNER JOIN cart c ON t.order_id = c.order_id
+          WHERE c.email = ? ORDER BY t.order_id DESC LIMIT 1";
+
+                                $stmt = $conn->prepare($query);
+                                $stmt->bind_param('s', $email);
+                                $stmt->execute();
+                                $result = $stmt->get_result();
+
+// Display the order_id
+                                if ($row = $result->fetch_assoc()) {
                                     echo '<div class="order-number">' . $row['order_id'] . '</div>';
                                 } else {
                                     echo '<div class="order-number">N/A</div>';
                                 }
 
-                                // Close the database connection
-                                mysqli_close($conn);
+// Close the database connection
+                                $conn->close();
                                 ?>
                                 <a href="accountsetting.php">
                                     <div class="complement">Go to Profile</div>
