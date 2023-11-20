@@ -52,7 +52,7 @@
 
 
     <?php
-    $page = 'nosqlreviews1'; // change this to match the name of the page
+    $page = 'nosqlreviews'; // change this to match the name of the page
     ?>
 
 

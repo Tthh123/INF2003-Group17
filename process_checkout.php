@@ -30,7 +30,6 @@ if ($result->num_rows > 0) {
         AND cart.email = '$userEmail'";
 
     if ($conn->query($sql) === TRUE) {
-        
     } else {
         echo "Error updating product quantities: " . $conn->error;
     }
@@ -68,9 +67,9 @@ if ($result->num_rows > 0) {
         $status_key = array_rand($order_status);
         $status = $order_status[$status_key];
 
-        
-        $sql = "INSERT INTO trackorder (order_id, deliveryid, ship_date, order_status , deliveryaddress)
-                SELECT '$order_id', '$delivery_id', '$ship_date', '$status', homeaddress FROM cart WHERE email = '$userEmail' AND order_id = '$order_id' LIMIT 1";
+        // Insert data into trackorder table
+        $sql = "INSERT INTO trackorder (order_id, deliveryid, ship_date, order_status, fname, lname, city, email, deliveryaddress)
+    SELECT order_id, '$delivery_id', '$ship_date', '$status', fname, lname, city, email, homeaddress FROM cart WHERE email = '$userEmail' AND order_id = '$order_id' LIMIT 1";
         if ($conn->query($sql) === TRUE) {
             
         } else {

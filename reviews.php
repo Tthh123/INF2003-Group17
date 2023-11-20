@@ -75,7 +75,7 @@
 
 
     <?php
-    $page = 'submitreviews'; // change this to match the name of the page
+    $page = 'reviews'; // change this to match the name of the page
     ?>
 
     <body>
@@ -86,9 +86,42 @@
 
         <section id="page-header" class="about-header">
 
-            <h2>#Satisfaction</h2>
-            <p>Feedback or Refunds? We will help you!</p>
+            <h2>#let's_talk</h2>
+            <p>Questions, Feedback, Refunds? We love to hear from you!</p>
 
+        </section>
+
+        <section id="contact-details" class="section-p1">
+            <div class="details">
+                <span>GET IN TOUCH</span>
+                <h2>Visit one of our agency locations or contact us today</h2>
+                <h3>Head Office</h3>
+                <div>
+                    <ul>
+                        <li>
+                            <i class="fal fa-map"></i>
+                            <p>311 New Upper Changi Rd, Singapore 467360</p>
+                        </li>
+                        <li>
+                            <i class="far fa-envelope"></i>
+                            <p>groomandgo@gmail.com </p>
+                        </li>
+                        <li>
+                            <i class="fas fa-phone-alt"></i>
+                            <p>+65 65248790</p>
+                        </li>
+                        <li>
+                            <i class="far fa-clock"></i>
+                            <p>Monday to Saturday: 9.00am to 6.00pm </p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="google-map">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d15955.007837819408!2d103.929343!3d1.3247162!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31da22cac116cd47%3A0x59401d9a012e23f3!2sBedok%20Mall!5e0!3m2!1sen!2ssg!4v1679899695522!5m2!1sen!2ssg" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+
+            </div>
         </section>
 
         <section id="form-details">

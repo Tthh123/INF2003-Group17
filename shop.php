@@ -41,7 +41,7 @@
 
     $searchTerm = filter_input(INPUT_GET, 'Search', FILTER_SANITIZE_STRING);
 
-    // Retrieve categories of the products from the database
+// Retrieve categories of the products from the database
     $config = parse_ini_file('../../private/db-config.ini');
     $conn = new mysqli($config['servername'], $config['username'], $config['password'], $config['dbname']);
 
@@ -61,13 +61,13 @@
     }
     $conn->close();
 
-    // Retrieve all products from the database
+// Retrieve all products from the database
     $conn = new mysqli($config['servername'], $config['username'], $config['password'], $config['dbname']);
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     }
 
-     // Retrieve all products from the database, filtered by category if applicable
+// Retrieve all products from the database, filtered by category if applicable
     if (isset($_GET['category']) && $_GET['category'] != 'All') {
         $category = $_GET['category'];
         $sql = "SELECT * FROM products WHERE category='$category'";

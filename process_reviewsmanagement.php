@@ -54,9 +54,6 @@
                 $sql .= " WHERE rating = $ratingFilter";
             }
 
-            // Add a LIMIT clause to restrict the results to the first 10 rows
-            $sql .= " LIMIT 10";
-
             // Execute the query
             $result = $conn->query($sql);
 

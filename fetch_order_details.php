@@ -18,7 +18,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Query the database for order details
     $sql = "SELECT name, quantity, subtotal, total, couponname, homeaddress, fname, lname, zip, email FROM cart WHERE order_id = '$orderId'";
     $result = mysqli_query($conn, $sql);
-    
     $orderDetails = [];
     $total = null;
     $couponname = null;

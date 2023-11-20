@@ -14,16 +14,9 @@ if ($conn->connect_error) {
 }
 
 
-// Query the database for the orders associated with the user's email
-$sql = "SELECT Distinct t.order_id, t.ship_date, t.deliveryid, t.order_status
-        FROM trackorder t
-        INNER JOIN cart c ON t.order_id = c.order_id
-        WHERE c.email = ?";
-
-$stmt = $conn->prepare($sql);
-$stmt->bind_param('s', $email);
-$stmt->execute();
-$result = $stmt->get_result();
+// Query the database for the orders associated with the email
+$sql = "SELECT order_id, ship_date, deliveryid, order_status FROM trackorder WHERE email = '$email'";
+$result = mysqli_query($conn, $sql);
 
 // Check if any orders were found
 if (mysqli_num_rows($result) > 0) {
