@@ -69,8 +69,6 @@
             </form>
 
             <?php
-            ini_set('display_errors', 1);
-            error_reporting(E_ALL);
             require 'vendor/autoload.php'; // Include the Composer autoload file
 
             $mongoDBClient = new MongoDB\Client("mongodb://localhost:27017");
