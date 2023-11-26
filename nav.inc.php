@@ -47,7 +47,7 @@ include "process_productsdetails.php";
                     if ($page == 'reviews1') {
                         echo 'class="active"';
                     }
-                    ?> href="nosqlreviewsmanagement.php">SQL Reviews</a></li>
+                    ?> href="sqlreviewsmanagement.php">SQL Reviews</a></li>
                 <?php } ?>
 
             <?php if (isset($_SESSION['usertype']) && $_SESSION['usertype'] == 'admin') { ?>
