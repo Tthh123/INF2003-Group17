@@ -69,55 +69,64 @@
             </form>
 
             <?php
+            ini_set('display_errors', 1);
+            error_reporting(E_ALL);
             require 'vendor/autoload.php'; // Include the Composer autoload file
 
             $mongoDBClient = new MongoDB\Client("mongodb://localhost:27017");
             $database = $mongoDBClient->selectDatabase('NoSQLDatabase');
-            $collection = $database->selectCollection('Reviews');
+            $collections = $database->listCollections();
 
             if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET)) {
                 $nameSearch = $_GET['nameSearch'] ?? '';
                 $messageSearch = $_GET['messageSearch'] ?? '';
                 $ratingFilter = $_GET['rating'] ?? '';
-                $rowCount = (int)$_GET['rows'] ?? 1000;
+                $rowCount = (int) $_GET['rows'] ?? 1000;
+                foreach ($collections as $collectionInfo) {
+                    $collectionName = $collectionInfo->getName();
+                    $collection = $database->selectCollection($collectionName);
+                    $pipeline = [];
 
-                $query = [];
-                if ($nameSearch !== '') {
-                    $query['name'] = new MongoDB\BSON\Regex($nameSearch, 'i');
+                    // Add match stage for name search
+                    if ($nameSearch !== '') {
+                        $pipeline[] = ['$match' => ['name' => new MongoDB\BSON\Regex($nameSearch, 'i')]];
+                    }
+
+                    // Add match stage for message search
+                    if ($messageSearch !== '') {
+                        $pipeline[] = ['$match' => ['message' => new MongoDB\BSON\Regex($messageSearch, 'i')]];
+                    }
+
+                    // Add match stage for rating filter
+                    if ($ratingFilter !== '') {
+                        $pipeline[] = ['$match' => ['rating' => $ratingFilter]];
+                    }
+
+                    // Add limit stage
+                    $pipeline[] = ['$limit' => $rowCount];
+
+                    // Start timing
+                    $startTime = microtime(true);
+
+                    try {
+                        // Perform the search with filters
+                        $cursor = $collection->aggregate($pipeline);
+                        // Retrieve the count result
+                        $countResult = $cursor->toArray();
+                        $count = count($countResult);
+                    } catch (Exception $e) {
+                        echo 'MongoDB Query Error: ' . $e->getMessage();
+                    }
+                    // End timing
+                    $endTime = microtime(true);
+                    $timeTaken = $endTime - $startTime;
+
+                    // Output the timing information
+                    echo "<div class='timing-results'>";
+                    echo "<strong>Query Time:</strong> " . number_format($timeTaken, 4) . " seconds<br>";
+                    echo "<strong>Number of Records Found:</strong> " . $count;
+                    echo "</div>";
                 }
-                if ($messageSearch !== '') {
-                    $query['message'] = new MongoDB\BSON\Regex($messageSearch, 'i');
-                }
-                if ($ratingFilter !== '') {
-                    $query['rating'] =  $ratingFilter;
-                }
-
-                var_dump($query);
-
-                // Start timing
-                $startTime = microtime(true);
-
-                try {
-                    // Perform the search with filters
-                    $cursor = $collection->find($query, ['limit' => $rowCount]);
-                } catch (Exception $e) {
-                    echo 'MongoDB Query Error: ' . $e->getMessage();
-                }
-                // End timing
-                $endTime = microtime(true);
-                $timeTaken = $endTime - $startTime;
-
-                // Output the results
-                foreach ($cursor as $doc) {
-                    // Display each document (review) here
-                    // Adjust the output to match your document structure
-                }
-
-                // Output the timing information
-                echo "<div class='timing-results'>";
-                echo "<strong>Query Time:</strong> " . number_format($timeTaken, 4) . " seconds<br>";
-                echo "<strong>Number of Records Found:</strong> " . count(iterator_to_array($cursor));
-                echo "</div>";
             } else {
                 echo "<p>Please enter search criteria.</p>";
             }
